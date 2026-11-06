@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Hare Krishna Japa</title>
+<style>
+  :root { color-scheme: light dark; --bg:#fffaf2; --fg:#2b1d0e; --mut:#8a7560; --acc:#e07b00; --card:#ffffff; --line:#eadfce; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#17120c; --fg:#f6ecdf; --mut:#b09a82; --acc:#ff9a1f; --card:#221a11; --line:#3a2d1f; } }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: -apple-system, system-ui, sans-serif; background:var(--bg); color:var(--fg); padding: 20px 16px 40px; }
+  h1 { font-size: 20px; text-align:center; margin: 4px 0 2px; }
+  .mantra { text-align:center; color:var(--mut); font-size:13px; line-height:1.5; margin-bottom: 16px; }
+  .pt { text-align:center; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin:12px 0; font-size:16px; line-height:1.6; font-weight:600; }
+  .pt-h { font-size:12px; color:var(--mut); font-weight:400; margin-bottom:4px; }
+  .big { text-align:center; }
+  .big .n { font-size: 96px; font-weight: 700; line-height: 1; color: var(--acc); transition: transform .12s; }
+  .big .n.bump { transform: scale(1.15); }
+  .big .sub { color: var(--mut); margin-top: 4px; }
+  .stats { display:flex; gap:8px; margin: 18px 0; }
+  .stat { flex:1; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:10px; text-align:center; }
+  .stat b { display:block; font-size: 22px; }
+  .stat span { font-size: 12px; color: var(--mut); }
+  .btns { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+  button { font-size:16px; padding: 12px 18px; border-radius: 999px; border:1px solid var(--line); background:var(--card); color:var(--fg); }
+  button.primary { background: var(--acc); color:#fff; border-color: var(--acc); font-weight:600; }
+  button.tap { width:100%; padding: 22px; font-size: 18px; }
+  .heard { min-height: 44px; margin: 14px 0; padding: 10px 12px; border-radius:12px; background:var(--card); border:1px dashed var(--line); font-size:14px; color:var(--mut); }
+  .status { text-align:center; font-size:13px; color:var(--mut); margin-top:8px; }
+  h2 { font-size: 16px; margin: 26px 0 8px; }
+  table { width:100%; border-collapse: collapse; font-size: 14px; }
+  td, th { padding: 8px 4px; border-bottom: 1px solid var(--line); text-align:left; }
+  th { color: var(--mut); font-weight: 500; font-size: 12px; }
+  td.r, th.r { text-align:right; }
+  .bars { display:flex; align-items:flex-end; gap:4px; height: 110px; padding: 8px 0; }
+  .bar { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; }
+  .bar i { display:block; width:100%; background: var(--acc); border-radius: 4px 4px 0 0; min-height: 2px; }
+  .bar small { font-size: 10px; color: var(--mut); margin-top: 3px; }
+  .note { font-size:12px; color:var(--mut); margin-top: 18px; line-height: 1.5; }
+</style>
+</head>
+<body>
+  <h1>Hare Krishna Japa</h1>
+  <div class="mantra" id="dateline"></div>
+  <div class="pt"><div class="pt-h">Before chanting, the Pancha Tattva mantra</div>Jaya Sri Krishna Chaitanya<br>Prabhu Nityananda<br>Sri Advaita Gadadhara<br>Srivasadi Gaura Bhakta Vrinda</div>
+  <div class="mantra">Hare Krishna Hare Krishna, Krishna Krishna Hare Hare<br>Hare Rama Hare Rama, Rama Rama Hare Hare</div>
+
+  <div class="big"><div class="n" id="inRound">0</div><div class="sub">of 108 in this round</div></div>
+
+  <div class="stats">
+    <div class="stat"><b id="todayM">0</b><span>Mantras today</span></div>
+    <div class="stat"><b id="todayR">0</b><span>Rounds today</span></div>
+    <div class="stat"><b id="streak">0</b><span>Day streak</span></div>
+  </div>
+
+  <div class="btns">
+    <button class="primary" id="listenBtn">Start listening</button>
+    <button id="undoBtn">Undo 1</button>
+  </div>
+  <div class="heard" id="heard">Words I hear will show here live.</div>
+  <button class="tap" id="tapBtn">Tap to add 1 mantra</button>
+  <div class="status" id="status"></div>
+
+  <h2>Lifetime progress</h2>
+  <div class="stats">
+    <div class="stat"><b id="lifeM">0</b><span>Total mantras</span></div>
+    <div class="stat"><b id="lifeR">0</b><span>Total rounds</span></div>
+    <div class="stat"><b id="lifeD">0</b><span>Days chanted</span></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><b id="bestD">0</b><span>Best day</span></div>
+    <div class="stat"><b id="longS">0</b><span>Longest streak</span></div>
+    <div class="stat"><b id="avgD">0</b><span>Avg per day</span></div>
+  </div>
+
+  <h2>Last 14 days</h2>
+  <div class="bars" id="bars"></div>
+
+  <h2>Today's sessions</h2>
+  <table>
+    <thead><tr><th>Started</th><th>Ended</th><th class="r">Mantras</th></tr></thead>
+    <tbody id="sess"></tbody>
+  </table>
+
+  <h2>Daily log</h2>
+  <table>
+    <thead><tr><th>Date</th><th>Time chanted</th><th class="r">Mantras</th><th class="r">Rounds</th></tr></thead>
+    <tbody id="log"></tbody>
+  </table>
+
+  <h2>Monthly report</h2>
+  <table>
+    <thead><tr><th>Month</th><th class="r">Days</th><th class="r">Mantras</th><th class="r">Rounds</th></tr></thead>
+    <tbody id="months"></tbody>
+  </table>
+
+  <h2>Yearly report</h2>
+  <table>
+    <thead><tr><th>Year</th><th class="r">Days</th><th class="r">Mantras</th><th class="r">Rounds</th></tr></thead>
+    <tbody id="years"></tbody>
+  </table>
+
+  <h2>Backup</h2>
+  <div class="btns">
+    <button id="expBtn">Save backup file</button>
+    <button id="impBtn">Restore from backup</button>
+    <input type="file" id="impFile" accept=".json,application/json" style="display:none">
+  </div>
+  <div class="note">Your history lives on this phone. Save a backup file now and then (to Files or iCloud Drive) so years of japa are never lost if Safari data is cleared or you change phones.</div>
+
+  <div class="note">A new session starts after a 10-minute break. Counts one mahamantra for every 8 holy names heard (4 Krishna + 4 Rama). Your history is saved on this phone in Safari. Tip: tap Share, then Add to Home Screen, to open it like an app.</div>
+
+<script>
+const KEY = "japa-data-v1";
+const NAMES_PER = 8;
+let data = JSON.parse(localStorage.getItem(KEY) || "{}"); // { "YYYY-MM-DD": {m:0, names:0, first:ts, last:ts} }
+const $ = id => document.getElementById(id);
+const dayKey = (d = new Date()) => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+const fmtTime = ts => new Date(ts).toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+const save = () => localStorage.setItem(KEY, JSON.stringify(data));
+function today() {
+  const k = dayKey();
+  if (!data[k]) data[k] = { m: 0, names: 0, first: null, last: null };
+  return data[k];
+}
+function addMantras(n) {
+  const t = today(); const now = Date.now();
+  t.m = Math.max(0, t.m + n);
+  if (n > 0) { if (!t.first) t.first = now; t.last = now; }
+  if (!t.sessions) t.sessions = [];
+  let cur = t.sessions[t.sessions.length-1];
+  if (n > 0 && (!cur || now - cur.end > 10*60*1000)) { cur = {start: now, end: now, m: 0}; t.sessions.push(cur); }
+  if (cur) { cur.m = Math.max(0, cur.m + n); if (n > 0) cur.end = now; }
+  save(); render(true);
+}
+function addNames(n) {
+  const t = today(); t.names += n;
+  let gained = 0;
+  while (t.names >= NAMES_PER) { t.names -= NAMES_PER; gained++; }
+  if (gained) addMantras(gained); else { save(); render(false); }
+}
+function streak() {
+  let s = 0; const d = new Date();
+  if (!(data[dayKey(d)] && data[dayKey(d)].m > 0)) d.setDate(d.getDate()-1);
+  while (data[dayKey(d)] && data[dayKey(d)].m > 0) { s++; d.setDate(d.getDate()-1); }
+  return s;
+}
+function render(bump) {
+  const t = today();
+  $("inRound").textContent = t.m % 108;
+  $("todayM").textContent = t.m;
+  $("todayR").textContent = Math.floor(t.m / 108);
+  $("streak").textContent = streak();
+  if (bump) { const el = $("inRound"); el.classList.add("bump"); setTimeout(() => el.classList.remove("bump"), 150); }
+  // bars
+  const days = []; const d = new Date(); d.setDate(d.getDate()-13);
+  for (let i=0;i<14;i++){ const k = dayKey(d); days.push({k, m: (data[k]||{}).m||0, lab: d.getDate()}); d.setDate(d.getDate()+1); }
+  const max = Math.max(1, ...days.map(x=>x.m));
+  $("bars").innerHTML = days.map(x => `<div class="bar" title="${x.k}: ${x.m}"><i style="height:${Math.round(x.m/max*90)}%"></i><small>${x.lab}</small></div>`).join("");
+  const ss = (t.sessions||[]).filter(x => x.m > 0).slice().reverse();
+  $("sess").innerHTML = ss.length ? ss.map(x => `<tr><td>${fmtTime(x.start)}</td><td>${fmtTime(x.end)}</td><td class="r">${x.m}</td></tr>`).join("") : `<tr><td colspan="3" style="color:var(--mut)">Sessions show here as you chant.</td></tr>`;
+  // lifetime
+  const all = Object.keys(data).filter(k => data[k].m > 0).sort();
+  const tot = all.reduce((a,k)=>a+data[k].m,0);
+  $("lifeM").textContent = tot.toLocaleString();
+  $("lifeR").textContent = Math.floor(tot/108).toLocaleString();
+  $("lifeD").textContent = all.length;
+  $("bestD").textContent = all.length ? Math.max(...all.map(k=>data[k].m)).toLocaleString() : 0;
+  $("avgD").textContent = all.length ? Math.round(tot/all.length).toLocaleString() : 0;
+  let best=0, run=0, prev=null;
+  all.forEach(k => { const d=new Date(k+"T12:00:00"); if (prev && Math.round((d-prev)/864e5)===1) run++; else run=1; best=Math.max(best,run); prev=d; });
+  $("longS").textContent = best;
+  const group = len => { const g={}; all.forEach(k=>{ const key=k.slice(0,len); g[key]=g[key]||{d:0,m:0}; g[key].d++; g[key].m+=data[k].m; }); return Object.keys(g).sort().reverse().map(key=>[key,g[key]]); };
+  const empty = n => `<tr><td colspan="${n}" style="color:var(--mut)">Fills in as you chant.</td></tr>`;
+  const ms = group(7);
+  $("months").innerHTML = ms.length ? ms.map(([k,v]) => `<tr><td>${new Date(k+"-01T12:00:00").toLocaleDateString([], {month:"long", year:"numeric"})}</td><td class="r">${v.d}</td><td class="r">${v.m.toLocaleString()}</td><td class="r">${Math.floor(v.m/108).toLocaleString()}</td></tr>`).join("") : empty(4);
+  const ys = group(4);
+  $("years").innerHTML = ys.length ? ys.map(([k,v]) => `<tr><td>${k}</td><td class="r">${v.d}</td><td class="r">${v.m.toLocaleString()}</td><td class="r">${Math.floor(v.m/108).toLocaleString()}</td></tr>`).join("") : empty(4);
+  // log
+  const keys = Object.keys(data).filter(k => data[k].m > 0).sort().reverse();
+  $("log").innerHTML = keys.length ? keys.map(k => {
+    const r = data[k]; const dt = new Date(k + "T12:00:00");
+    const time = r.first ? fmtTime(r.first) + " – " + fmtTime(r.last) : "";
+    return `<tr><td>${dt.toLocaleDateString([], {month:"short", day:"numeric", weekday:"short"})}</td><td>${time}</td><td class="r">${r.m}</td><td class="r">${Math.floor(r.m/108)}</td></tr>`;
+  }).join("") : `<tr><td colspan="4" style="color:var(--mut)">Your days will appear here once you start chanting.</td></tr>`;
+}
+
+// Voice
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, want = false, wakeLock = null;
+const RE = /(krish|krsn|kris|christ|crush|rama|rahma|roma|rum|ram)/gi;
+function countNames(txt) { const m = txt.match(RE); return m ? m.length : 0; }
+let interimCounted = 0;
+async function keepAwake() {
+  try { if (navigator.wakeLock) { wakeLock = await navigator.wakeLock.request("screen"); } } catch(e) {}
+}
+document.addEventListener("visibilitychange", () => { if (want && document.visibilityState === "visible") keepAwake(); });
+
+function startRec() {
+  if (!SR) { $("status").textContent = "Voice listening isn't available in this browser. Open this page in Safari, or use the tap button."; return; }
+  rec = new SR();
+  rec.continuous = true; rec.interimResults = true; rec.lang = "en-IN";
+  rec.onresult = ev => {
+    let live = "";
+    for (let i = ev.resultIndex; i < ev.results.length; i++) {
+      const res = ev.results[i]; const txt = res[0].transcript;
+      live += txt + " ";
+      const c = countNames(txt);
+      if (res.isFinal) { const add = c - interimCounted; if (add > 0) addNames(add); interimCounted = 0; }
+      else if (c > interimCounted) { addNames(c - interimCounted); interimCounted = c; }
+    }
+    $("heard").textContent = live.trim() || "Listening…";
+  };
+  rec.onerror = ev => {
+    if (ev.error === "not-allowed" || ev.error === "service-not-allowed") {
+      want = false; setBtn(); $("status").textContent = "Microphone was blocked. In Settings, allow Safari to use the microphone, then try again.";
+    }
+  };
+  rec.onend = () => { interimCounted = 0; if (want) { try { rec.start(); } catch(e) { setTimeout(() => { try { rec.start(); } catch(_){} }, 300); } } };
+  try { rec.start(); want = true; $("status").textContent = "Listening. Chant clearly; the count rises as names are heard."; } catch(e) { $("status").textContent = "Couldn't start listening. Try again."; }
+  setBtn();
+}
+function stopRec() { want = false; if (rec) try { rec.stop(); } catch(e){} if (wakeLock) { wakeLock.release().catch(()=>{}); wakeLock = null; } $("status").textContent = "Paused. Today's count is saved."; setBtn(); }
+function setBtn() { $("listenBtn").textContent = want ? "Pause listening" : "Start listening"; }
+
+$("listenBtn").onclick = () => { if (want) stopRec(); else { keepAwake(); startRec(); } };
+$("tapBtn").onclick = () => { keepAwake(); addMantras(1); };
+$("undoBtn").onclick = () => addMantras(-1);
+$("expBtn").onclick = () => {
+  const blob = new Blob([JSON.stringify(data, null, 1)], {type: "application/json"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "japa-backup-" + dayKey() + ".json"; a.click();
+};
+$("impBtn").onclick = () => $("impFile").click();
+$("impFile").onchange = e => {
+  const f = e.target.files[0]; if (!f) return;
+  f.text().then(t => {
+    try { const inc = JSON.parse(t);
+      Object.keys(inc).forEach(k => { if (!data[k] || (inc[k].m||0) > (data[k].m||0)) data[k] = inc[k]; });
+      save(); render(false); $("status").textContent = "Backup restored.";
+    } catch(err) { $("status").textContent = "That file isn't a japa backup."; }
+  });
+};
+$("dateline").textContent = new Date().toLocaleDateString([], {weekday:"long", month:"long", day:"numeric", year:"numeric"});
+render(false);
+</script>
+</body>
+</html>
